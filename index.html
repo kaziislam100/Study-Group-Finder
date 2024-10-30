@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Group Finder</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Import Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js" defer></script>
+
+    <!-- Set type="module" for files using import/export -->
+    <script src="firebase-config.js" defer type="module"></script>
+    <script src="auth.js" defer type="module"></script>
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <h1>Study Group Finder</h1>
+
+    <!-- Login Section -->
+    <div id="login-container" class="form-container">
+        <h2>Login with Google</h2>
+        <button id="google-login-btn">Login with Google</button>
+    </div>
+
+    <!-- Group Creation Form -->
+    <div id="groupFormContainer" class="form-container" style="display:none;">
+        <h2>Create a Study Group</h2>
+        <form id="groupForm">
+            <input type="text" id="courseName" placeholder="Course Name" required>
+            <input type="text" id="topic" placeholder="Topic" required>
+            <input type="number" id="maxParticipants" placeholder="Max Participants" required>
+            <button type="submit">Create Group</button>
+        </form>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container" style="display:none;">
+        <input type="text" id="searchBar" placeholder="Search by Course or Topic">
+    </div>
+
+    <!-- Group Display Section -->
+    <div class="group-list" id="groupList"></div>
+
+</body>
+</html>
