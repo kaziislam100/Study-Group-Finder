@@ -1,139 +1,49 @@
-/* Base styles */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
-    margin: 0;
-    padding: 0;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Group Finder</title>
+    <link rel="stylesheet" href="style.css">
 
-/* Main header */
-h1 {
-    text-align: center;
-    margin-top: 20px;
-    color: #4285f4; /* Google blue */
-}
+    <!-- Import Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js" defer></script>
 
-/* Container styles for forms */
-.form-container {
-    width: 350px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+    <!-- Set type="module" for files using import/export -->
+    <script src="firebase-config.js" defer type="module"></script>
+    <script src="auth.js" defer type="module"></script>
+    <script src="app.js" defer type="module"></script>
+</head>
+<body>
+    <h1>Study Group Finder</h1>
 
-h2 {
-    margin-bottom: 15px;
-    font-size: 1.5em;
-    color: #333;
-}
+    <!-- Login Section -->
+    <div id="login-container" class="form-container">
+        <h2>Login with Google</h2>
+        <button id="google-login-btn">Login with Google</button>
+    </div>
 
-/* Input fields */
-input[type="text"],
-input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    transition: border 0.3s;
-}
+    <!-- Group Creation Form -->
+    <div id="groupFormContainer" class="form-container" style="display:none;">
+        <h2>Create a Study Group</h2>
+        <form id="groupForm">
+            <input type="text" id="courseName" placeholder="Course Name" required>
+            <input type="text" id="topic" placeholder="Topic" required>
+            <input type="number" id="maxParticipants" placeholder="Max Participants" required>
+            <button type="submit">Create Group</button>
+        </form>
+        
+        <button id="logout-btn">Logout</button>
+    </div>
 
-input[type="text"]:focus,
-input[type="number"]:focus {
-    border-color: #4285f4; /* Change border color on focus */
-}
+    <!-- Search Bar -->
+    <div class="search-container" style="display:none;">
+        <input type="text" id="searchBar" placeholder="Search by Course or Topic">
+    </div>
 
-/* Button styles */
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #4285f4;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #357ae8; /* Darker blue on hover */
-}
-
-/* Search bar container */
-.search-container {
-    width: 350px;
-    margin: 20px auto;
-    padding: 10px;
-    text-align: center;
-}
-
-/* Group list styles */
-.group-list {
-    margin: 20px auto;
-    width: 350px;
-    text-align: center;
-}
-
-.group {
-    background-color: #e1f5fe; /* Light blue background */
-    border: 1px solid #81d4fa; /* Blue border */
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
-}
-
-.group:hover {
-    transform: scale(1.02); /* Slight zoom on hover */
-}
-
-.group h3 {
-    margin: 0 0 5px;
-    font-size: 1.25em;
-    color: #333;
-}
-
-.group p {
-    margin: 5px 0;
-    color: #666;
-}
-
-/* Logout button styles */
-#logout-btn {
-    margin-top: 10px;
-    background-color: #db4437; /* Google red */
-}
-
-#logout-btn:hover {
-    background-color: #c13526; /* Darker red on hover */
-}
-
-/* Responsive adjustments */
-@media (max-width: 400px) {
-    .form-container,
-    .search-container,
-    .group-list {
-        width: 90%;
-    }
-}
-
-.delete-button {
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: #d9534f; /* Bootstrap danger color */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.delete-button:hover {
-    background-color: #c9302c; /* Darker red on hover */
-}
+    <!-- Group Display Section -->
+    <div class="group-list" id="groupList"></div>
+</body>
+</html>
