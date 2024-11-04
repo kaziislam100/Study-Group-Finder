@@ -1,5 +1,7 @@
 import { auth } from './firebase-config.js';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { db } from './firebase-config.js';
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Reference to the login button and logout button
 const googleLoginBtn = document.getElementById('google-login-btn');
@@ -11,7 +13,23 @@ googleLoginBtn.addEventListener('click', async () => {
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        console.log('User logged in:', user);
+
+        // Check if user exists in Firestore
+        const userDoc = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(userDoc);
+
+        if (!docSnap.exists()) {
+            // If the user does not exist, create a new user with the default role
+            await setDoc(userDoc, {
+                displayName: user.displayName,
+                email: user.email,
+                role: 'regular' // Set default role to regular
+            });
+            console.log('New user created with role: regular');
+        } else {
+            console.log('User already exists in Firestore:', docSnap.data());
+        }
+
         showGroupCreationForm(user); // Show the group creation form if login is successful
     } catch (error) {
         console.error('Error during login:', error.message);
@@ -30,18 +48,23 @@ logoutBtn.addEventListener('click', async () => {
 });
 
 // Listen for authentication state changes
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // User is signed in, show the group creation form
-        showGroupCreationForm(user);
+        const userDoc = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(userDoc);
+        
+        if (docSnap.exists()) {
+            const userData = docSnap.data();
+            console.log('User data:', userData);
+            showGroupCreationForm(user, userData.role); // Show the group creation form if login is successful
+        }
     } else {
-        // User is signed out, show login form
         showLoginForm();
     }
 });
 
 // Function to show the group creation form
-function showGroupCreationForm(user) {
+function showGroupCreationForm(user, role) {
     document.getElementById('login-container').style.display = 'none';
     document.getElementById('groupFormContainer').style.display = 'block';
     document.querySelector('.search-container').style.display = 'block';
