@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Group Finder</title>
     <link rel="stylesheet" href="style.css">
-    
+
     <!-- Import Firebase JS SDK -->
     <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js" defer></script>
 
     <!-- Set type="module" for files using import/export -->
     <script src="firebase-config.js" defer type="module"></script>
     <script src="auth.js" defer type="module"></script>
-    <script src="app.js" defer></script>
+    <script src="app.js" defer type="module"></script>
 </head>
 <body>
     <h1>Study Group Finder</h1>
@@ -35,7 +36,6 @@
         </form>
         
         <button id="logout-btn">Logout</button>
-        
     </div>
 
     <!-- Search Bar -->
@@ -45,6 +45,5 @@
 
     <!-- Group Display Section -->
     <div class="group-list" id="groupList"></div>
-
 </body>
 </html>
