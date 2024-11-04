@@ -1,8 +1,9 @@
-// app.js
+import { db } from './firebase-config.js';
+import { collection, addDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Handle group creation form submission
 const groupForm = document.getElementById('groupForm');
-groupForm.addEventListener('submit', (e) => {
+groupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const courseName = document.getElementById('courseName').value;
@@ -14,20 +15,60 @@ groupForm.addEventListener('submit', (e) => {
         courseName,
         topic,
         maxParticipants,
+        createdAt: new Date(),
     };
     
-    console.log('Group Created:', newGroup);
-    
-    // Clear form after submission
-    groupForm.reset();
-    
-    // You can save the group to Firebase Firestore if you need persistence
+    try {
+        await addDoc(collection(db, 'groups'), newGroup);
+        console.log('Group Created:', newGroup);
+        
+        // Clear form after submission
+        groupForm.reset();
+    } catch (error) {
+        console.error('Error adding group:', error.message);
+    }
+});
+
+// Function to display groups
+function displayGroups(groups) {
+    const groupList = document.getElementById('groupList');
+    groupList.innerHTML = ''; // Clear existing groups
+
+    groups.forEach(group => {
+        const groupDiv = document.createElement('div');
+        groupDiv.classList.add('group');
+        groupDiv.innerHTML = `
+            <h3>${group.courseName}</h3>
+            <p>Topic: ${group.topic}</p>
+            <p>Max Participants: ${group.maxParticipants}</p>
+        `;
+        groupList.appendChild(groupDiv);
+    });
+}
+
+// Real-time listener for groups
+const q = query(collection(db, 'groups'));
+onSnapshot(q, (querySnapshot) => {
+    const groups = [];
+    querySnapshot.forEach((doc) => {
+        groups.push({ id: doc.id, ...doc.data() });
+    });
+    displayGroups(groups);
 });
 
 // Handle search functionality
 const searchBar = document.getElementById('searchBar');
 searchBar.addEventListener('input', (e) => {
     const searchValue = e.target.value.toLowerCase();
-    // Implement search logic based on course name or topic
-    console.log('Searching for:', searchValue);
+    const groupItems = document.querySelectorAll('.group');
+
+    groupItems.forEach(group => {
+        const courseName = group.querySelector('h3').textContent.toLowerCase();
+        const topic = group.querySelector('p').textContent.toLowerCase();
+        if (courseName.includes(searchValue) || topic.includes(searchValue)) {
+            group.style.display = 'block';
+        } else {
+            group.style.display = 'none';
+        }
+    });
 });
