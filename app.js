@@ -1,5 +1,5 @@
-import { db } from './firebase-config.js';
-import { collection, addDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { db, auth } from './firebase-config.js';
+import { collection, addDoc, onSnapshot, query, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Handle group creation form submission
 const groupForm = document.getElementById('groupForm');
@@ -10,7 +10,6 @@ groupForm.addEventListener('submit', async (e) => {
     const topic = document.getElementById('topic').value;
     const maxParticipants = document.getElementById('maxParticipants').value;
     
-    // Simple group object
     const newGroup = {
         courseName,
         topic,
@@ -21,18 +20,20 @@ groupForm.addEventListener('submit', async (e) => {
     try {
         await addDoc(collection(db, 'groups'), newGroup);
         console.log('Group Created:', newGroup);
-        
-        // Clear form after submission
         groupForm.reset();
     } catch (error) {
         console.error('Error adding group:', error.message);
     }
 });
 
-// Function to display groups
-function displayGroups(groups) {
+// Function to display groups based on user role
+function displayGroups(groups, userRole) {
     const groupList = document.getElementById('groupList');
     groupList.innerHTML = ''; // Clear existing groups
+
+    if (groups.length === 0) {
+        groupList.innerHTML = '<p>No groups available.</p>';
+    }
 
     groups.forEach(group => {
         const groupDiv = document.createElement('div');
@@ -42,6 +43,24 @@ function displayGroups(groups) {
             <p>Topic: ${group.topic}</p>
             <p>Max Participants: ${group.maxParticipants}</p>
         `;
+
+        // Add delete button if user is an admin
+        if (userRole === 'admin') {
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete Group';
+            deleteButton.classList.add('delete-button');
+            deleteButton.addEventListener('click', async () => {
+                const groupDocRef = doc(db, 'groups', group.id);
+                try {
+                    await deleteDoc(groupDocRef);
+                    console.log('Group deleted:', group.id);
+                } catch (error) {
+                    console.error('Error deleting group:', error.message);
+                }
+            });
+            groupDiv.appendChild(deleteButton);
+        }
+
         groupList.appendChild(groupDiv);
     });
 }
@@ -53,7 +72,23 @@ onSnapshot(q, (querySnapshot) => {
     querySnapshot.forEach((doc) => {
         groups.push({ id: doc.id, ...doc.data() });
     });
-    displayGroups(groups);
+
+    console.log('Fetched groups:', groups);
+
+    // Check user role and display groups accordingly
+    const user = auth.currentUser;
+    if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        getDoc(userDocRef).then((docSnap) => {
+            const userData = docSnap.data();
+            console.log('User role:', userData.role);
+            displayGroups(groups, userData.role); // Pass the user's role
+        }).catch(error => {
+            console.error('Error fetching user role:', error);
+        });
+    } else {
+        displayGroups(groups, null);
+    }
 });
 
 // Handle search functionality
