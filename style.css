@@ -107,8 +107,12 @@ button:hover {
 
 /* Logout button styles */
 #logout-btn {
-    margin-top: 10px;
-    background-color: #db4437; /* Google red */
+    width: 15%; 
+    display: inline-block; 
+    margin: 10px auto; /* Center-align */
+    background-color: #ec6155; /* Google red */
+    cursor: pointer;
+    text-align: center;
 }
 
 #logout-btn:hover {
