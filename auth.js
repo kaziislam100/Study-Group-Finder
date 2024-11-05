@@ -1,10 +1,10 @@
-// Import necessary Firebase components
 import { auth } from './firebase-config.js';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { db } from './firebase-config.js';
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Reference to login and logout buttons
+
+// Reference to the login button and logout button
 const googleLoginBtn = document.getElementById('google-login-btn');
 const logoutBtn = document.getElementById('logout-btn');
 
@@ -31,7 +31,7 @@ googleLoginBtn.addEventListener('click', async () => {
             console.log('User already exists in Firestore:', docSnap.data());
         }
 
-        showGroupCreationForm(user); // Show the appropriate elements for the user
+        showGroupCreationForm(user); // Show the group creation form if login is successful
     } catch (error) {
         console.error('Error during login:', error.message);
     }
@@ -57,18 +57,18 @@ onAuthStateChanged(auth, async (user) => {
         if (docSnap.exists()) {
             const userData = docSnap.data();
             console.log('User data:', userData);
-            showGroupCreationForm(user, userData.role); // Show the appropriate form based on role
+            showGroupCreationForm(user, userData.role); // Show the group creation form if login is successful
         }
     } else {
         showLoginForm();
     }
 });
 
-// Function to show group creation form for admins and search bar for all users
+// Function to show the group creation form
 function showGroupCreationForm(user, role) {
     document.getElementById('login-container').style.display = 'none';
-    document.querySelector('.search-container').style.display = 'block'; // Show search for all users
-    document.getElementById('logout-btn').style.display = 'block'; // Show logout button for all logged-in users
+    document.getElementById('groupFormContainer').style.display = 'block';
+    document.querySelector('.search-container').style.display = 'block';
 
     if (role === 'admin') {
         // Show group creation form only for admins
@@ -81,26 +81,9 @@ function showGroupCreationForm(user, role) {
     }
 }
 
-
-// Function to show the login form (initial state)
+// Function to show the login form
 function showLoginForm() {
-    document.getElementById('login-container').style.display = 'block';   // Show login container
-    document.getElementById('groupFormContainer').style.display = 'none'; // Hide group form
-    document.querySelector('.search-container').style.display = 'none';   // Hide search container
-    document.getElementById('logout-btn').style.display = 'none';         // Hide logout button initially
-}
-
-// Function to handle UI after login based on user role
-function showGroupCreationForm(user, role) {
-    document.getElementById('login-container').style.display = 'none';    // Hide login container
-    document.querySelector('.search-container').style.display = 'block';  // Show search for all users
-    document.getElementById('logout-btn').style.display = 'block';        // Show logout button for all logged-in users
-
-    if (role === 'admin') {
-        document.getElementById('groupFormContainer').style.display = 'block'; // Show group creation form for admins
-        console.log('Admin logged in:', user.displayName, user.email);
-    } else {
-        document.getElementById('groupFormContainer').style.display = 'none';  // Hide group creation form for regular users
-        console.log('Regular user logged in:', user.displayName, user.email);
-    }
+    document.getElementById('login-container').style.display = 'block';
+    document.getElementById('groupFormContainer').style.display = 'none';
+    document.querySelector('.search-container').style.display = 'none';
 }
